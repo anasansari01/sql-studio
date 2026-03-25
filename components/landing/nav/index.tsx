@@ -11,13 +11,12 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 h-16 border-b border-[#30363d] bg-[#0f1117]/90 backdrop-blur-md">
       <div className="mx-auto flex h-full max-w-screen-2xl items-center justify-between px-4 md:px-6">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 group-hover:bg-indigo-500 transition-colors">
             <Database className="h-4 w-4 text-white" />
           </div>
           <span className="font-bold text-[#e6edf3] text-lg hidden sm:block">
-            Cipher<span className="text-indigo-400">SQL</span>Studio
+            <span className="text-indigo-400">SQL</span>Studio
           </span>
         </Link>
 
