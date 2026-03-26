@@ -1,0 +1,1 @@
+ALTER TABLE "assignments" ADD COLUMN "solution_query" text NOT NULL;
