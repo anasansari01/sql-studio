@@ -85,10 +85,40 @@ export const solvedAssignments = pgTable(
   })
 );
 
-export const assignmentsRelations = relations(assignments, ({ many }) => ({
-  attempts: many(attempts),
-  solvedBy: many(solvedAssignments),
-}));
+export const categories = pgTable("categories", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull().default("BookOpen"),
+  color: text("color").notNull().default("indigo"),
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const assignmentCategories = pgTable(
+  "assignment_categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    assignmentId: uuid("assignment_id")
+      .notNull()
+      .references(() => assignments.id, { onDelete: "cascade" }),
+
+    categoryId: uuid("category_id")
+      .notNull()
+      .references(() => categories.id, { onDelete: "cascade" }),
+
+    position: integer("position").notNull().default(0),
+  },
+  (t) => ({
+    unique: unique("assignment_category_unique").on(
+      t.assignmentId,
+      t.categoryId
+    ),
+  })
+);
 
 export const usersRelations = relations(users, ({ many }) => ({
   attempts: many(attempts),
@@ -125,6 +155,30 @@ export const solvedAssignmentsRelations = relations(
   })
 );
 
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  assignmentCategories: many(assignmentCategories),
+}));
+
+export const assignmentCategoriesRelations = relations(
+  assignmentCategories,
+  ({ one }) => ({
+    assignment: one(assignments, {
+      fields: [assignmentCategories.assignmentId],
+      references: [assignments.id],
+    }),
+    category: one(categories, {
+      fields: [assignmentCategories.categoryId],
+      references: [categories.id],
+    }),
+  })
+);
+
+export const assignmentsRelations = relations(assignments, ({ many }) => ({
+  attempts: many(attempts),
+  solvedBy: many(solvedAssignments),
+  assignmentCategories: many(assignmentCategories),
+}));
+
 export type Assignment = typeof assignments.$inferSelect;
 export type NewAssignment = typeof assignments.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -135,5 +189,8 @@ export type Attempt = typeof attempts.$inferSelect;
 export type NewAttempt = typeof attempts.$inferInsert;
 export type SolvedAssignment = typeof solvedAssignments.$inferSelect;
 export type NewSolvedAssignment = typeof solvedAssignments.$inferInsert;
+export type Category = typeof categories.$inferSelect;
+export type NewCategory = typeof categories.$inferInsert;
+export type AssignmentCategory = typeof assignmentCategories.$inferSelect;
 
 export type SafeUser = Omit<User, "passwordHash">;

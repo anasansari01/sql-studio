@@ -22,6 +22,13 @@
       "when": 1774522100053,
       "tag": "0002_square_victor_mancha",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775191213461,
+      "tag": "0003_long_captain_cross",
+      "breakpoints": true
     }
   ]
 }
