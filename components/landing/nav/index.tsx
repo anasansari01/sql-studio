@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Database, BookOpen, Github, LayoutDashboard, LogOut, LogIn, UserPlus, ChevronDown } from "lucide-react";
+import { Database, BookOpen, Github, LayoutDashboard, LogOut, LogIn, UserPlus, ChevronDown, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/hooks/useUser";
 import { useState, useRef, useEffect } from "react";
@@ -36,6 +36,19 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-1">
+          <Link
+            href="/hub"
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              pathname === "/hub" || pathname.startsWith("/hub/")
+                ? "bg-[#21262d] text-[#e6edf3]"
+                : "text-[#8b949e] hover:bg-[#21262d] hover:text-[#e6edf3]"
+            )}
+          >
+            <Layers className="h-4 w-4" />
+            <span className="hidden sm:block">Hub</span>
+          </Link>
+
           <Link
             href="/assignments"
             className={cn(
@@ -121,7 +134,10 @@ export function Navbar() {
 
                   <div className="border-t border-[#30363d] py-1">
                     <button
-                      onClick={() => { setDropdownOpen(false); logout(); }}
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        logout();
+                      }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
