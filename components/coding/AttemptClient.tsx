@@ -46,6 +46,8 @@ interface Assignment {
 interface Props {
   assignment: Assignment;
   schemaInfo: TableInfo[];
+  backHref?: string;
+  backLabel?: string;
 }
 
 type BottomTab = "results" | "hint";
@@ -58,7 +60,12 @@ const BOTTOM_TABS = [
 
 const DEFAULT_QUERY = "-- Write your SQL query here\n-- Press Ctrl+Enter (or Cmd+Enter) to run\n\nSELECT ";
 
-export function AttemptClient({ assignment, schemaInfo }: Props) {
+export function AttemptClient({
+  assignment,
+  schemaInfo,
+  backHref = "/assignments",
+  backLabel = "Assignments",
+}: Props) {
   const isMobile = useMobile();
   const [query, setQuery] = useState(DEFAULT_QUERY);
   const [leftTab, setLeftTab] = useState<LeftTab>("question");
@@ -125,6 +132,8 @@ export function AttemptClient({ assignment, schemaInfo }: Props) {
         onRun={handleRun}
         onGetHint={handleGetHint}
         onReset={handleReset}
+        backHref={backHref}
+        backLabel={backLabel}
       />
     );
   }
@@ -154,19 +163,18 @@ export function AttemptClient({ assignment, schemaInfo }: Props) {
 
       <div className="flex items-center gap-3 px-4 h-12 border-b border-[#30363d] bg-[#161b22] shrink-0">
         <Link
-          href="/assignments"
+          href={backHref}
           className="flex items-center gap-1.5 text-xs text-[#8b949e] hover:text-[#e6edf3] transition-colors"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
-          Assignments
+          {backLabel}
         </Link>
 
         <div className="w-px h-4 bg-[#30363d]" />
 
         <button
           onClick={() => setLeftPanelOpen((p) => !p)}
-          className="btn-ghost text-xs p-1.5 cursor-pointer rounded-md text-[#8b949e] hover:text-[#e6edf3] transition-colors  shrink-0"
-          title={leftPanelOpen ? "Hide panel" : "Show panel"}
+          className="btn-ghost text-xs p-1.5 cursor-pointer rounded-md text-[#8b949e] hover:text-[#e6edf3] transition-colors shrink-0"
         >
           {leftPanelOpen ? (
             <PanelLeftClose className="h-4 w-4" />
@@ -189,7 +197,10 @@ export function AttemptClient({ assignment, schemaInfo }: Props) {
         )}
 
         <div className="ml-auto flex items-center gap-4">
-          <button onClick={handleCopy} className="btn-ghost text-xs cursor-pointer rounded-md text-[#8b949e] hover:text-[#e6edf3] transition-colors  shrink-0">
+          <button
+            onClick={handleCopy}
+            className="btn-ghost text-xs cursor-pointer rounded-md text-[#8b949e] hover:text-[#e6edf3] transition-colors shrink-0"
+          >
             {copied ? (
               <>
                 <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -203,7 +214,10 @@ export function AttemptClient({ assignment, schemaInfo }: Props) {
             )}
           </button>
 
-          <button onClick={handleReset} className="btn-ghost text-xs cursor-pointer rounded-md text-[#8b949e] hover:text-[#e6edf3] transition-colors  shrink-0">
+          <button
+            onClick={handleReset}
+            className="btn-ghost text-xs cursor-pointer rounded-md text-[#8b949e] hover:text-[#e6edf3] transition-colors shrink-0"
+          >
             <RotateCcw className="h-3.5 w-3.5" />
             <span className="hidden sm:block">Reset</span>
           </button>
@@ -226,14 +240,21 @@ export function AttemptClient({ assignment, schemaInfo }: Props) {
           >
             <Play className="h-3.5 w-3.5 fill-current" />
             {queryLoading ? "Running…" : "Run"}
-            <span className="hidden lg:block text-indigo-300 font-normal">⌘↵</span>
+            <span className="hidden lg:block text-indigo-300 font-normal">
+              ⌘↵
+            </span>
           </button>
         </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
         {leftPanelOpen && (
-          LeftPanel({ assignment, schemaInfo, leftTab, setLeftTab })
+          <LeftPanel
+            assignment={assignment}
+            schemaInfo={schemaInfo}
+            leftTab={leftTab}
+            setLeftTab={setLeftTab}
+          />
         )}
 
         <div className="flex flex-col flex-1 overflow-hidden">
@@ -245,7 +266,9 @@ export function AttemptClient({ assignment, schemaInfo }: Props) {
               <div className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
               <div className="h-2.5 w-2.5 rounded-full bg-amber-500/60" />
               <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
-              <span className="text-xs text-[#484f58] ml-2 font-mono">query.sql</span>
+              <span className="text-xs text-[#484f58] ml-2 font-mono">
+                query.sql
+              </span>
             </div>
             <div className="flex-1 overflow-hidden">
               <SqlEditor

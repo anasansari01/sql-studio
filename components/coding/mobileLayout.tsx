@@ -1,6 +1,15 @@
 "use client";
 
-import { BarChart2, BookOpen, ChevronLeft, Database, Lightbulb, PlayIcon, RotateCcw, Trophy } from "lucide-react";
+import {
+  BarChart2,
+  BookOpen,
+  ChevronLeft,
+  Database,
+  Lightbulb,
+  PlayIcon,
+  RotateCcw,
+  Trophy,
+} from "lucide-react";
 import Link from "next/link";
 import { DifficultyBadge } from "../difficultyBadge";
 import { useState } from "react";
@@ -47,6 +56,8 @@ interface MobileLayoutProps {
   onRun: () => void;
   onGetHint: () => void;
   onReset: () => void;
+  backHref?: string;
+  backLabel?: string;
 }
 
 export function MobileLayout({
@@ -65,6 +76,8 @@ export function MobileLayout({
   onRun,
   onGetHint,
   onReset,
+  backHref = "/assignments",
+  backLabel = "Assignments",
 }: MobileLayoutProps) {
   const [mobileTab, setMobileTab] = useState<MobileTab>("problem");
 
@@ -82,17 +95,26 @@ export function MobileLayout({
         <div className="flex items-center gap-2 px-3 py-2 bg-emerald-900/30 border-b border-emerald-700/40 text-xs text-emerald-300 shrink-0">
           <Trophy className="h-3.5 w-3.5 text-amber-400 shrink-0" />
           <span className="flex-1">🎉 Correct! Assignment solved.</span>
-          <Link href="/dashboard" className="text-emerald-400 underline underline-offset-2">
+          <Link
+            href="/dashboard"
+            className="text-emerald-400 underline underline-offset-2"
+          >
             Dashboard
           </Link>
         </div>
       )}
 
       <div className="flex items-center justify-between px-3 py-2 border-b border-[#30363d] bg-[#161b22] shrink-0">
-        <Link href="/assignments" className="text-[#8b949e] hover:text-[#e6edf3]">
+        <Link
+          href={backHref}
+          className="flex items-center gap-1 text-[#8b949e] hover:text-[#e6edf3]"
+        >
           <ChevronLeft className="h-5 w-5" />
+          <span className="text-xs">{backLabel}</span>
         </Link>
-        <span className="text-xs font-medium text-[#e6edf3] truncate max-w-45">{assignment.title}</span>
+        <span className="text-xs font-medium text-[#e6edf3] truncate max-w-45">
+          {assignment.title}
+        </span>
         <DifficultyBadge difficulty={assignment.difficulty} />
       </div>
 
@@ -110,12 +132,13 @@ export function MobileLayout({
           >
             <tab.icon className="h-3.5 w-3.5" />
             {tab.label}
-
             {tab.id === "results" && validation && !queryLoading && (
               <span
                 className={cn(
                   "h-1.5 w-1.5 rounded-full ml-1",
-                  validation.isCorrect ? "bg-emerald-400" : "bg-amber-400"
+                  validation.isCorrect
+                    ? "bg-emerald-400"
+                    : "bg-amber-400"
                 )}
               />
             )}
@@ -142,7 +165,9 @@ export function MobileLayout({
               <button onClick={onReset} className="btn-ghost text-xs p-1.5">
                 <RotateCcw className="h-3.5 w-3.5" />
               </button>
-              <span className="text-xs text-[#484f58] font-mono flex-1">query.sql</span>
+              <span className="text-xs text-[#484f58] font-mono flex-1">
+                query.sql
+              </span>
               <button
                 onClick={onGetHint}
                 disabled={hintLoading}
@@ -173,7 +198,12 @@ export function MobileLayout({
         )}
 
         {mobileTab === "results" && (
-          <ResultsPanel result={result} error={error} validation={validation} isLoading={queryLoading} />
+          <ResultsPanel
+            result={result}
+            error={error}
+            validation={validation}
+            isLoading={queryLoading}
+          />
         )}
 
         {mobileTab === "hint" && (
