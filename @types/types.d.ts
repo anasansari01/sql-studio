@@ -51,3 +51,15 @@ export interface Attempt {
   executionTimeMs: number | null;
   createdAt: string;
 }
+
+interface CategoryCard {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  displayOrder: number;
+  totalAssignments: number;
+  solvedAssignments: number;
+}
