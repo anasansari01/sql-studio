@@ -34,6 +34,9 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  googleId: text("google_id").unique(),
+  avatarUrl: text("avatar_url"),
+  emailVerified: boolean("email_verified").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -120,6 +123,22 @@ export const assignmentCategories = pgTable(
   })
 );
 
+export const otpPurposeEnum = pgEnum("otp_purpose", [
+  "register",
+  "login",
+  "reset_password",
+]);
+
+export const otpCodes = pgTable("otp_codes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull(),
+  codeHash: text("code_hash").notNull(),
+  purpose: otpPurposeEnum("purpose").notNull(),
+  attempts: integer("attempts").notNull().default(0),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
   attempts: many(attempts),
   sessions: many(sessions),
@@ -192,5 +211,6 @@ export type NewSolvedAssignment = typeof solvedAssignments.$inferInsert;
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
 export type AssignmentCategory = typeof assignmentCategories.$inferSelect;
+export type OtpCode = typeof otpCodes.$inferSelect;
 
 export type SafeUser = Omit<User, "passwordHash">;
