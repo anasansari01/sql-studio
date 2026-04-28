@@ -4,7 +4,7 @@ import { verifyToken } from "@/lib/auth";
 export const runtime = "nodejs";
 
 const PROTECTED_PATHS = ["/attempt", "/dashboard"];
-const GUEST_ONLY_PATHS = ["/login", "/register"];
+const GUEST_ONLY_PATHS = ["/login", "/register", "/forgot-password"];
 
 async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -17,14 +17,18 @@ async function proxy(req: NextRequest) {
     isAuthenticated = !!payload;
   }
 
-  const isProtected = PROTECTED_PATHS.some((p) => pathname.startsWith(p));
+  const isProtected = PROTECTED_PATHS.some((p) =>
+    pathname.startsWith(p)
+  );
   if (isProtected && !isAuthenticated) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  const isGuestOnly = GUEST_ONLY_PATHS.some((p) => pathname.startsWith(p));
+  const isGuestOnly = GUEST_ONLY_PATHS.some((p) =>
+    pathname.startsWith(p)
+  );
   if (isGuestOnly && isAuthenticated) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
@@ -38,6 +42,7 @@ export const config = {
     "/dashboard/:path*",
     "/login",
     "/register",
+    "/forgot-password",
   ],
 };
 
