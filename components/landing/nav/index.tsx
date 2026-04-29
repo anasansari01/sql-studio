@@ -31,7 +31,7 @@ export function Navbar() {
             <Database className="h-4 w-4 text-white" />
           </div>
           <span className="font-bold text-[#e6edf3] text-lg hidden sm:block">
-            <span className="text-indigo-400">SQL</span>Studio
+            <span className="text-indigo-400">SQL{" "}</span>Studio
           </span>
         </Link>
 
@@ -97,10 +97,19 @@ export function Navbar() {
                 onClick={() => setDropdownOpen((p) => !p)}
                 className="flex items-center gap-2 rounded-lg px-3 py-1.5 hover:bg-[#21262d] transition-colors"
               >
-                <div className="h-7 w-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-                <span className="text-sm font-medium text-[#e6edf3] hidden sm:block max-w-30 truncate">
+                {(user as { avatarUrl?: string }).avatarUrl ? (
+                  <img
+                    src={(user as { avatarUrl?: string }).avatarUrl}
+                    alt={user.name}
+                    className="h-7 w-7 rounded-full object-cover shrink-0"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="h-7 w-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="text-sm font-medium text-[#e6edf3] hidden sm:block max-w-[120px] truncate">
                   {user.name}
                 </span>
                 <ChevronDown className={cn("h-3.5 w-3.5 text-[#8b949e] transition-transform", dropdownOpen && "rotate-180")} />
@@ -134,10 +143,7 @@ export function Navbar() {
 
                   <div className="border-t border-[#30363d] py-1">
                     <button
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        logout();
-                      }}
+                      onClick={() => { setDropdownOpen(false); logout(); }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
@@ -148,6 +154,7 @@ export function Navbar() {
               )}
             </div>
           ) : (
+            // Guest buttons
             <>
               <Link
                 href="/login"
