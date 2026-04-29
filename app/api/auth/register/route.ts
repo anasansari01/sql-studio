@@ -2,22 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { hashPassword } from "@/lib/hashPassword";
-import { createSession, setSessionCookie } from "@/lib/auth";
+import { createOtp } from "@/lib/otp";
+import { sendOtpEmail } from "@/lib/email";
 import { z } from "zod";
 
 const registerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters").max(60),
-  email: z.string().email("Invalid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(72),
+  name:     z.string().min(2, "Name must be at least 2 characters").max(60),
+  email:    z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters").max(72),
 });
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body   = await req.json();
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -28,11 +25,12 @@ export async function POST(req: NextRequest) {
     }
 
     const { name, email, password } = parsed.data;
+    const normalEmail = email.toLowerCase().trim();
 
     const [existing] = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.email, email.toLowerCase()))
+      .where(eq(users.email, normalEmail))
       .limit(1);
 
     if (existing) {
@@ -42,30 +40,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const passwordHash = await hashPassword(password);
+    const code = await createOtp(normalEmail, "register");
+    await sendOtpEmail(normalEmail, code, "register");
 
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        name: name.trim(),
-        email: email.toLowerCase().trim(),
-        passwordHash,
-      })
-      .returning({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
-      });
-
-    const token = await createSession(newUser);
-    await setSessionCookie(token);
-
-    return NextResponse.json(
-      { user: newUser, message: "Account created successfully." },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      requiresOtp: true,
+      message: "Verification code sent. Please check your email.",
+      email: normalEmail,
+    });
   } catch (err) {
     console.error("[POST /api/auth/register]", err);
     return NextResponse.json(
