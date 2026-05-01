@@ -101,7 +101,7 @@ export async function getSession(): Promise<SafeUser | null> {
       .where(eq(users.id, payload.sub))
       .limit(1);
 
-    return user ?? null;
+    return user as SafeUser ?? null;
   } catch {
     return null;
   }
