@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 
-export const runtime = "nodejs";
-
 const PROTECTED_PATHS = ["/attempt", "/dashboard"];
 const GUEST_ONLY_PATHS = ["/login", "/register", "/forgot-password"];
 
-async function proxy(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  const isRelevant =
+    PROTECTED_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
+    GUEST_ONLY_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+
+  if (!isRelevant) {
+    return NextResponse.next();
+  }
 
   const token = req.cookies.get("cipher_session")?.value;
   let isAuthenticated = false;
@@ -17,33 +23,21 @@ async function proxy(req: NextRequest) {
     isAuthenticated = !!payload;
   }
 
-  const isProtected = PROTECTED_PATHS.some((p) =>
-    pathname.startsWith(p)
-  );
-  if (isProtected && !isAuthenticated) {
+  if (
+    PROTECTED_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) &&
+    !isAuthenticated
+  ) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  const isGuestOnly = GUEST_ONLY_PATHS.some((p) =>
-    pathname.startsWith(p)
-  );
-  if (isGuestOnly && isAuthenticated) {
+  if (
+    GUEST_ONLY_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) &&
+    isAuthenticated
+  ) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: [
-    "/attempt/:path*",
-    "/dashboard/:path*",
-    "/login",
-    "/register",
-    "/forgot-password",
-  ],
-};
-
-export default proxy;
