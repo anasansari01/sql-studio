@@ -93,6 +93,7 @@ export async function getSession(): Promise<SafeUser | null> {
         id: users.id,
         name: users.name,
         email: users.email,
+        emailVerified: users.emailVerified,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt,
       })
