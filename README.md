@@ -443,7 +443,7 @@ Contributions are welcome! If you'd like to improve the project:
 Built with passion by **Anas Ansari** — a developer dedicated to AI-powered applications, clean architecture, and modern web technologies.
 
 [![GitHub](https://img.shields.io/badge/GitHub-anasansari01-181717?logo=github&style=flat)](https://github.com/anasansari01)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Anas%20Ansari-0077B5?logo=linkedin&style=flat)](https://linkedin.com/in/anasansari01)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Anas%20Ansari-0077B5?logo=linkedin&style=flat)](https://linkedin.com/in/4nas-ansari)
 
 ---
 
